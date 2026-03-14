@@ -2,6 +2,7 @@ import { Application, Clipboard, getApplications, open, showToast, Toast } from 
 import { showFailureToast } from "@raycast/utils";
 import { spawnSync } from "node:child_process";
 import path from "node:path";
+import { findApplication } from "./application";
 import { extractCmuxWorkingDirectory } from "./cmux";
 
 export async function runAppleScript(script: string) {
@@ -22,7 +23,7 @@ export const isTerminal = (val: string): val is Terminal => val !== "Clipboard" 
 
 export async function getApplication(name: Terminal): Promise<Application> {
   const applications = await getApplications();
-  const app = applications.find((app) => app.name === name);
+  const app = findApplication(applications, name);
   if (!app) throw new Error(`${name} not found`);
   return app;
 }
