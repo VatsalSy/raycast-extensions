@@ -2,6 +2,7 @@ import { Application, Clipboard, getApplications, open, showToast, Toast } from 
 import { showFailureToast } from "@raycast/utils";
 import { spawnSync } from "node:child_process";
 import path from "node:path";
+import { extractCmuxWorkingDirectory } from "./cmux";
 
 export async function runAppleScript(script: string) {
   if (process.platform !== "darwin") {
@@ -55,45 +56,10 @@ export async function runCmuxCommand(args: string[]) {
   return result.stdout.trim();
 }
 
-function findFirstString(value: unknown, keys: string[]): string | undefined {
-  if (!value || typeof value !== "object") {
-    return undefined;
-  }
-
-  if (Array.isArray(value)) {
-    for (const item of value) {
-      const match = findFirstString(item, keys);
-      if (match) return match;
-    }
-    return undefined;
-  }
-
-  const record = value as Record<string, unknown>;
-  for (const key of keys) {
-    const candidate = record[key];
-    if (typeof candidate === "string" && candidate.trim()) {
-      return candidate;
-    }
-  }
-
-  for (const nested of Object.values(record)) {
-    const match = findFirstString(nested, keys);
-    if (match) return match;
-  }
-
-  return undefined;
-}
-
 export async function getCmuxWorkingDirectory() {
   const stdout = await runCmuxCommand(["--json", "sidebar-state"]);
   const parsed = JSON.parse(stdout) as unknown;
-  const cwd = findFirstString(parsed, ["cwd", "workingDirectory", "working_directory"]);
-
-  if (!cwd) {
-    throw new Error("cmux did not return a working directory for the focused workspace");
-  }
-
-  return cwd;
+  return extractCmuxWorkingDirectory(parsed);
 }
 export async function clipboardToApplication(name: Terminal) {
   try {
