@@ -32,6 +32,8 @@ export async function checkApplication(name: Terminal) {
   await getApplication(name);
 }
 
+const CMUX_COMMAND_TIMEOUT_MS = 10_000;
+
 function formatCmuxError(message: string) {
   if (message.includes("Access denied")) {
     return "cmux denied external control. In cmux, open Settings -> Automation and set Socket Mode to Allow all local processes or Password.";
@@ -40,14 +42,24 @@ function formatCmuxError(message: string) {
   return message || "cmux command failed";
 }
 
+function formatCmuxProcessError(error: NodeJS.ErrnoException) {
+  if (error.code === "ETIMEDOUT") {
+    return new Error(
+      "cmux command timed out. In cmux, open Settings -> Automation and set Socket Mode to Allow all local processes or Password.",
+    );
+  }
+
+  return error;
+}
+
 export async function runCmuxCommand(args: string[]) {
   const app = await getApplication("cmux");
   const cliPath = path.join(app.path, "Contents", "Resources", "bin", "cmux");
-  const result = spawnSync(cliPath, args, { encoding: "utf8" });
+  const result = spawnSync(cliPath, args, { encoding: "utf8", timeout: CMUX_COMMAND_TIMEOUT_MS });
   const output = [result.stdout, result.stderr].filter(Boolean).join("\n").trim();
 
   if (result.error) {
-    throw result.error;
+    throw formatCmuxProcessError(result.error);
   }
 
   if (result.status !== 0) {
