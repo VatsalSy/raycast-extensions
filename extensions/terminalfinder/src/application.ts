@@ -31,5 +31,7 @@ export function findApplication<T extends TerminalApplication>(applications: T[]
     return undefined;
   }
 
-  return applications.find((app) => [app.name, app.localizedName, app.bundleId].some((value) => normalize(value) === normalizedName));
+  return applications.find((app) =>
+    [app.name, app.localizedName, app.bundleId].some((value) => normalize(value) === normalizedName),
+  );
 }
