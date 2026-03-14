@@ -15,19 +15,21 @@ export function findApplication<T extends TerminalApplication>(applications: T[]
   const knownBundleId = KNOWN_BUNDLE_IDS[name as keyof typeof KNOWN_BUNDLE_IDS];
   const normalizedName = normalize(name);
 
-  return applications.find((app) => {
-    if (app.name === name || app.localizedName === name) {
-      return true;
-    }
+  const exactMatch = applications.find((app) => app.name === name || app.localizedName === name);
+  if (exactMatch) {
+    return exactMatch;
+  }
 
-    if (knownBundleId && app.bundleId === knownBundleId) {
-      return true;
+  if (knownBundleId) {
+    const bundleIdMatch = applications.find((app) => app.bundleId === knownBundleId);
+    if (bundleIdMatch) {
+      return bundleIdMatch;
     }
+  }
 
-    if (!normalizedName) {
-      return false;
-    }
+  if (!normalizedName) {
+    return undefined;
+  }
 
-    return [app.name, app.localizedName, app.bundleId].some((value) => normalize(value) === normalizedName);
-  });
+  return applications.find((app) => [app.name, app.localizedName, app.bundleId].some((value) => normalize(value) === normalizedName));
 }
