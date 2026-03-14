@@ -1,6 +1,6 @@
 import { Toast, showToast } from "@raycast/api";
 import { showFailureToast } from "@raycast/utils";
-import { checkApplication, runAppleScript, runCmuxCommand } from "./utils";
+import { runAppleScript, runCmuxCommand } from "./utils";
 
 export default async () => {
   const finderScript = `
@@ -20,7 +20,6 @@ export default async () => {
   `;
 
   try {
-    await checkApplication("cmux");
     const directory = (await runAppleScript(finderScript)).trim();
     const result = await runCmuxCommand([directory]);
     await showToast(Toast.Style.Success, "Done", result);
