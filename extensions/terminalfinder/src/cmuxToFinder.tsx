@@ -1,7 +1,6 @@
-import { Toast, showToast } from "@raycast/api";
+import { Toast, showToast, open } from "@raycast/api";
 import { showFailureToast } from "@raycast/utils";
 import { getCmuxWorkingDirectory } from "./utils";
-import { open } from "@raycast/api";
 
 export default async () => {
   try {
