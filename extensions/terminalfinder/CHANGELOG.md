@@ -1,6 +1,6 @@
 # Terminal Finder Changelog
 
-## [Update] - {PR_MERGE_DATE}
+## [Update] - 2026-03-27
 
 - Added support for `cmux`
 - Switched `cmux` integration to the bundled CLI for reliable workspace creation and working-directory lookup
